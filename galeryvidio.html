@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeri Video </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-image: radial-gradient(circle at 10% 20%, rgba(255, 182, 193, 0.15) 0%, rgba(255, 192, 203, 0.2) 90%);
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .video-thumbnail::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0) 100%);
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .video-card:hover .video-thumbnail::after {
+            opacity: 0.4;
+        }
+
+        .play-button {
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .video-card:hover .play-button {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .modal {
+            transition: all 0.3s ease-out;
+        }
+
+        .animate-bounce-soft {
+            animation: bounce-soft 2s infinite;
+        }
+
+        @keyframes bounce-soft {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12 text-center">
+            <h1 class="text-5xl font-bold text-pink-500 mb-4 animate-bounce-soft">Galeri Video 💖</h1>
+            <p class="text-xl text-gray-700 max-w-2xl mx-auto">Temukan koleksi video-video paling lucu yang akan membuat
+                harimu lebih cerita!</p>
+
+            <div class="mt-8 max-w-xl mx-auto relative">
+                <input type="text" id="search-input" placeholder="Cari video lucu..."
+                    class="w-full px-6 py-3 rounded-full border-2 border-amber-300 focus:border-amber-500 focus:outline-none shadow-lg">
+                <button id="search-button"
+                    class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-pink-400 hover:bg-pink-500 text-white p-2 rounded-full">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <div class="flex justify-center mt-6 space-x-4">
+                <button class="filter-btn px-4 py-2 rounded-full bg-pink-100 text-pink-800 hover:bg-pink-200 transition"
+                    data-category="all">Memo Pribadi</button>
+                <button class="filter-btn px-4 py-2 rounded-full bg-pink-100 text-pink-800 hover:bg-pink-200 transition"
+                    data-category="family">Keluarga</button>
+                <button class="filter-btn px-4 py-2 rounded-full bg-pink-100 text-pink-800 hover:bg-pink-200 transition"
+                    data-category="friends">Teman</button>
+                <button class="filter-btn px-4 py-2 rounded-full bg-pink-100 text-pink-800 hover:bg-pink-200 transition"
+                    data-category="self">Diri Sendiri</button>
+            </div>
+        </header>
+
+        <!-- Video Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="video-grid">
+            <!-- Video items will be inserted here via JavaScript -->
+        </div>
+
+        <!-- Removing load more button since we only show 3 videos -->
+    </div>
+
+    <!-- Video Modal -->
+    <div id="video-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black bg-opacity-80 p-4">
+        <div class="bg-white rounded-xl overflow-hidden relative max-w-4xl w-full">
+            <button id="close-modal"
+                class="absolute right-4 top-4 z-10 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="relative pb-[56.25%]">
+                <iframe id="modal-video" class="absolute top-0 left-0 w-full h-full" src="" frameborder="0"
+                    allowfullscreen></iframe>
+            </div>
+            <div class="p-6">
+                <h3 id="modal-title" class="text-2xl font-bold text-gray-800 mb-2"></h3>
+                <p id="modal-description" class="text-gray-600"></p>
+                <div class="flex justify-between items-center mt-4">
+                    <div class="flex items-center text-pink-500">
+                        <i class="fas fa-thumbs-up mr-2"></i>
+                        <span id="modal-likes">0</span>
+                    </div>
+                    <div class="text-gray-500">
+                        <span id="modal-views">0</span> views
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Removing random button -->
+
+    <script>
+        // Sample video data
+        const videoData = [
+            {
+                id: 1,
+                title: "Anjing Lucu Main Skateboard",
+                thumbnail: "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/32a0b9ef-a62d-4c19-aaab-7f49c08e63c1.png",
+                youtubeId: "PBjN6vTzAmo",
+                category: "animals",
+                description: "Anjing pintar ini mencuri perhatian dengan trik skateboardnya!",
+                views: 1200000,
+                likes: 98000
+            },
+            {
+                id: 2,
+                title: "Bayi Tertawa Karena Gelembung",
+                thumbnail: "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/d2ef8703-2d3c-453d-98e7-64c971e1f2a5.png",
+                youtubeId: "RP4abiHdQpc",
+                category: "kids",
+                description: "Tawa bayi yang menular saat bermain dengan gelembung sabun.",
+                views: 3450000,
+                likes: 235000
+            },
+            {
+                id: 3,
+                title: "Kucing Gagal Melompat",
+                thumbnail: "https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c0901ca6-079a-4336-b7a8-712b09f06ed2.png",
+                youtubeId: "ZcJjMnHoIBI",
+                category: "animals",
+                description: "Ekspresi kucing ini setelah gagal melompat terlalu menggemaskan!",
+                views: 5670000,
+                likes: 342000
+            }
+        ];
+
+        // DOM elements
+        const videoGrid = document.getElementById('video-grid');
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const filters = document.querySelectorAll('.filter-btn');
+        const loadMoreBtn = document.getElementById('load-more');
+        const videoModal = document.getElementById('video-modal');
+        const modalVideo = document.getElementById('modal-video');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDescription = document.getElementById('modal-description');
+        const modalLikes = document.getElementById('modal-likes');
+        const modalViews = document.getElementById('modal-views');
+        const closeModal = document.getElementById('close-modal');
+        const randomBtn = document.getElementById('random-btn');
+
+        // Current state
+        let currentCategory = 'all';
+        let currentSearch = '';
+        let loadedVideos = 3;
+        const videosPerLoad = 4;
+
+        // Initialize the gallery
+        function initGallery() {
+            renderVideos(videoData.slice(0, loadedVideos));
+            setupEventListeners();
+        }
+
+        // Render videos to the grid
+        function renderVideos(videos) {
+            videos.forEach(video => {
+                const videoCard = document.createElement('div');
+                videoCard.className = 'video-card bg-white rounded-xl overflow-hidden shadow-md transition duration-300 cursor-pointer';
+                videoCard.dataset.id = video.id;
+                videoCard.dataset.category = video.category;
+
+                videoCard.innerHTML = `
+                    <div class="video-thumbnail relative">
+                        <img src="${video.thumbnail}" alt="${video.title}" class="w-full h-48 object-cover">
+                        <div class="play-button absolute inset-0 flex items-center justify-center text-white text-4xl">
+                            <i class="fas fa-play-circle bg-pink-400 rounded-full p-2 shadow-lg"></i>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-1 truncate">${video.title}</h3>
+                        <div class="flex justify-between items-center text-sm text-gray-500">
+                            <span>${formatNumber(video.views)} views</span>
+                            <span class="flex items-center text-amber-500">
+                                <i class="fas fa-thumbs-up mr-1"></i>
+                                ${formatNumber(video.likes)}
+                            </span>
+                        </div>
+                    </div>
+                `;
+
+                videoGrid.appendChild(videoCard);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search functionality
+            searchButton.addEventListener('click', handleSearch);
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleSearch();
+            });
+
+            // Filter buttons
+            filters.forEach(button => {
+                button.addEventListener('click', () => {
+                    filters.forEach(btn => btn.classList.remove('bg-pink-400', 'text-white'));
+                    button.classList.add('bg-pink-400', 'text-white');
+                    currentCategory = button.dataset.category;
+                    applyFilters();
+                });
+            });
+
+            // Video click to open modal
+            videoGrid.addEventListener('click', (e) => {
+                const videoCard = e.target.closest('.video-card');
+                if (videoCard) {
+                    const videoId = parseInt(videoCard.dataset.id);
+                    const video = videoData.find(v => v.id === videoId);
+                    openVideoModal(video);
+                }
+            });
+
+            // Close modal
+            closeModal.addEventListener('click', closeVideoModal);
+            videoModal.addEventListener('click', (e) => {
+                if (e.target === videoModal) closeVideoModal();
+            });
+
+            // Load more videos
+            loadMoreBtn.addEventListener('click', loadMoreVideos);
+
+            // Random video button
+            randomBtn.addEventListener('click', playRandomVideo);
+        }
+
+        // Handle search
+        function handleSearch() {
+            currentSearch = searchInput.value.toLowerCase();
+            applyFilters();
+        }
+
+        // Apply both category and search filters
+        function applyFilters() {
+            videoGrid.innerHTML = '';
+            loadedVideos = 8;
+
+            let filteredVideos = videoData.filter(video => {
+                const matchesCategory = currentCategory === 'all' || video.category === currentCategory;
+                const matchesSearch = video.title.toLowerCase().includes(currentSearch) ||
+                    video.description.toLowerCase().includes(currentSearch);
+                return matchesCategory && matchesSearch;
+            });
+
+            renderVideos(filteredVideos.slice(0, loadedVideos));
+
+            // Hide or show load more button
+            loadMoreBtn.style.display = filteredVideos.length > loadedVideos ? 'block' : 'none';
+        }
+
+        // Load more videos
+        function loadMoreVideos() {
+            let filteredVideos = videoData.filter(video => {
+                const matchesCategory = currentCategory === 'all' || video.category === currentCategory;
+                const matchesSearch = video.title.toLowerCase().includes(currentSearch) ||
+                    video.description.toLowerCase().includes(currentSearch);
+                return matchesCategory && matchesSearch;
+            });
+
+            const nextVideos = filteredVideos.slice(loadedVideos, loadedVideos + videosPerLoad);
+            renderVideos(nextVideos);
+            loadedVideos += videosPerLoad;
+
+            if (loadedVideos >= filteredVideos.length) {
+                loadMoreBtn.style.display = 'none';
+            }
+        }
+
+        // Open video modal
+        function openVideoModal(video) {
+            modalVideo.src = https://www.youtube.com/embed/${video.youtubeId}?autoplay=1;
+            modalTitle.textContent = video.title;
+            modalDescription.textContent = video.description;
+            modalLikes.textContent = formatNumber(video.likes);
+            modalViews.textContent = formatNumber(video.views);
+            videoModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close video modal
+        function closeVideoModal() {
+            modalVideo.src = '';
+            videoModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Play random video
+        function playRandomVideo() {
+            const filteredVideos = videoData.filter(video => {
+                const matchesCategory = currentCategory === 'all' || video.category === currentCategory;
+                const matchesSearch = video.title.toLowerCase().includes(currentSearch) ||
+                    video.description.toLowerCase().includes(currentSearch);
+                return matchesCategory && matchesSearch;
+            });
+
+            if (filteredVideos.length > 0) {
+                const randomIndex = Math.floor(Math.random() * filteredVideos.length);
+                openVideoModal(filteredVideos[randomIndex]);
+            }
+        }
+
+        // Helper function to format numbers
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            }
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toString();
+        }
+
+        // Initialize the gallery when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initGallery);
+    </script>
+</body>
+
+</html>

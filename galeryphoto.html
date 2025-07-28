@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cute Small Photo Gallery</title>
+<style>
+  body {
+    background: #ffedf7;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    margin: 20px;
+    color: #4a2c57;
+    text-align: center;
+  }
+  h1 {
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 25px;
+    letter-spacing: 3px;
+    color: #c95a87;
+    text-shadow: 1px 1px 2px #f4a1c1;
+  }
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .photo-card {
+    background: #fff4fb;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(201, 90, 135, 0.3);
+    cursor: pointer;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 10px;
+  }
+  .photo-card:hover {
+    transform: scale(1.15) rotate(-3deg);
+    box-shadow: 0 8px 20px rgba(201, 90, 135, 0.6);
+  }
+  .photo-card img {
+    width: 100%;
+    height: 120px;
+    border-radius: 15px;
+    object-fit: cover;
+    filter: drop-shadow(2px 4px 3px rgba(249, 199, 237, 0.4));
+  }
+  .caption {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: #b66b90;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+  <h1>My Cute favorite photo</h1>
+  <div class="gallery" role="list">
+    <div class="photo-card" role="listitem" tabindex="0" aria-label="Cute kitten smiling">
+      <img src="foto.jpg" alt="pinky" />
+      <div class="caption">nudy</div>
+    </div>
+    <div class="photo-card" role="listitem" tabindex="0" aria-label="pita lucu">
+      <img src="abu.jpg" alt="pita pita" />
+      <div class="caption">abu</div>
+    </div>
+    <div class="photo-card" role="listitem" tabindex="0" aria-label="Funny baby bunny ears up">
+      <img src="pinky.jpg" alt="foto lucu" />
+      <div class="caption">my pinky</div>
+    </div>
+    <div class="photo-card" role="listitem" tabindex="0" aria-label="pita pinkyy">
+      <img src="abu1.jpg" alt="pitaaa" />
+      <div class="caption">coquette</div>
+    </div>
+    <div class="photo-card" role="listitem" tabindex="0" aria-label="my pinky ">
+      <img src="purple.jpg" alt="beautiful" />
+      <div class="caption">berangkat kuliah</div>
+    </div>
+    <div class="photo-card" role="listitem" tabindex="0" aria-label="positivevibes">
+      <img src="red.jpg" alt="positivevibes" />
+      <div class="caption">positivevibes</div>
+    </div>
+  </div>
+</body>
+</html>
